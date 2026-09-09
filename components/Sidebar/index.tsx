@@ -5,6 +5,7 @@ import styles from './index.module.scss';
 export default function Sidebar() {
   return (
     <aside className={styles.sidebar}>
+      <div className={styles.sidebar__inner}>
         <Image
           src="/img/common/logo/logo_simple.svg"
           alt="ロゴ"
@@ -13,7 +14,8 @@ export default function Sidebar() {
           height={18}
           priority
         />
-      <GlobalNav />
+        <GlobalNav />
+      </div>
     </aside>
   );
 }

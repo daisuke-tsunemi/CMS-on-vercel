@@ -12,12 +12,12 @@ type Props = {
   description: string;
   content: string;
   publishedAt: string;
-  eyecatch: {
+  eyecatch?: {
     url: string;
     height?: number;
     width?: number;
   };
-  category: {
+  category?: {
     id: string;
     name: string;
   };
@@ -50,14 +50,14 @@ export default async function BlogPostPage({ params }: { params: Promise<{ id: s
             <time className="c-txt__sm">{formattedDate}</time>
           </div>
           <Image
-            src={post.eyecatch.url}
-            width={post.eyecatch.width}
-            height={post.eyecatch.height}
-            layout="responsive"
+            src={post.eyecatch?.url ?? '/img/common/no-image.webp'}
+            width={post.eyecatch?.width ?? 800}
+            height={post.eyecatch?.height ?? 420}
+            sizes="100vw"
             alt="記事のサムネイル"
-            loading="lazy"
+            priority
             unoptimized // 一時的に追加
-            style={{ objectFit: 'cover' }}
+            style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
             className={styles.thumbnail}
           />
           <div>

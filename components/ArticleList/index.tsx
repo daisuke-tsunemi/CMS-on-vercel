@@ -7,40 +7,48 @@ export type Post = {
   id: string;
   title: string;
   publishedAt?: string;
-  eyecatch: {
+  eyecatch?: {
     url: string;
     height?: number;
     width?: number;
   };
-  category: Category;
+  category?: Category;
 };
 
 type NewsListProps = {
   posts: Post[];
 };
 
+// first view に入る先頭2件だけ eager 読み込みにして LCP を改善する
+const ABOVE_THE_FOLD_COUNT = 2;
+
 export default function NewsList({ posts }: NewsListProps) {
   return (
     <div className={`${styles.article__list} ${''}`}>
-      {posts.map((post) => (
+      {posts.map((post, index) => {
+        const isAboveTheFold = index < ABOVE_THE_FOLD_COUNT;
+
+        return (
           <Link key={post.id} href={`/news/${post.id}`} className={`${styles.article__item} ${''}`}>
             {post.eyecatch ? (
               <picture>
                 <source
                   type="image/webp"
                   media="(max-width: 640px)"
-                  srcSet={`${post.eyecatch?.url}?fm=webp&w=414 1x, ${post.eyecatch?.url}?fm=webp&w=414&dpr=2 2x`}
+                  srcSet={`${post.eyecatch.url}?fm=webp&w=414 1x, ${post.eyecatch.url}?fm=webp&w=414&dpr=2 2x`}
                 />
                 <source
                   type="image/webp"
-                  srcSet={`${post.eyecatch?.url}?fm=webp&fit=crop&w=240&h=126 1x, ${post.eyecatch?.url}?fm=webp&fit=crop&w=240&h=126&dpr=2 2x`}
+                  srcSet={`${post.eyecatch.url}?fm=webp&fit=crop&w=240&h=126 1x, ${post.eyecatch.url}?fm=webp&fit=crop&w=240&h=126&dpr=2 2x`}
                 />
                 <img
-                  src={post.eyecatch?.url || `"/img/common/no-image.webp`}
-                  alt="No Image"
+                  src={post.eyecatch.url}
+                  alt={post.title}
                   className={styles.list__image}
-                  width={post.eyecatch?.width}
-                  height={post.eyecatch?.height}
+                  width={post.eyecatch.width}
+                  height={post.eyecatch.height}
+                  loading={isAboveTheFold ? 'eager' : 'lazy'}
+                  fetchPriority={isAboveTheFold ? 'high' : 'auto'}
                 />
               </picture>
             ) : (
@@ -50,7 +58,7 @@ export default function NewsList({ posts }: NewsListProps) {
                 alt="No Image"
                 width={320}
                 height={160}
-                loading="lazy"
+                priority={isAboveTheFold}
               />
             )}
             <div className={`${styles.article__itemText} ${''}`}>
@@ -58,14 +66,17 @@ export default function NewsList({ posts }: NewsListProps) {
                 {post.publishedAt && (
                   <time className={`${styles.time} ${'weight__700'}`}>{new Date(post.publishedAt).toLocaleDateString('ja-JP')}</time>
                 )}
-                <span className={`${styles.tag} ${'c-txt__min weight__500'}`}>{post.category.name}</span>
+                {post.category && (
+                  <span className={`${styles.tag} ${'c-txt__min weight__500'}`}>{post.category.name}</span>
+                )}
               </div>
               <h3 className={`${styles.article__itemTitle} ${'c-heading--md'}`}>
                 {post.title}
               </h3>
             </div>
           </Link>
-      ))}
+        );
+      })}
     </div>
   );
 }

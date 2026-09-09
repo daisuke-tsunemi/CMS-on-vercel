@@ -1,12 +1,12 @@
 @use "@/styles/foundation/variables" as *;
 .wrapper{
   width: 100%;
-  padding:3px;
+  padding:.5vh;
   display: grid;
-  gap: 3px;
+  gap: .5vh;
   @include respond-lg{
     grid-template-columns: 12.5rem 1fr;
-    height: 100vh;
+    min-height: 100vh;
   }
   >*{
     min-height: 1px;
