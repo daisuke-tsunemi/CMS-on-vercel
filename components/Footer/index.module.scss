@@ -1,0 +1,9 @@
+@use "@/styles/foundation/variables" as *;
+.footer {
+  width: 100%;
+  padding: 1vh 1vw;
+}
+.cr{
+  color: var(--text-light);
+  font-size: 10px;
+}
