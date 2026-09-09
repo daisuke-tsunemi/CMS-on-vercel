@@ -1,21 +1,18 @@
 import Image from 'next/image';
-import Link from 'next/link';
 import GlobalNav from '@/components/GlobalNav';
 import styles from './index.module.scss';
 
-export default function Header() {
+export default function Sidebar() {
   return (
-    <aside className={styles.header}>
-      <Link href="/" className='u-mt8'>
+    <aside className={styles.sidebar}>
         <Image
           src="/img/common/logo/logo_simple.svg"
           alt="ロゴ"
-          className={styles.header__logo}
+          className={styles.sidebar__logo}
           width={58}
           height={18}
           priority
         />
-      </Link>
       <GlobalNav />
     </aside>
   );

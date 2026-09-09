@@ -37,7 +37,7 @@ export default function NewsList({ posts }: NewsListProps) {
                 />
                 <img
                   src={post.eyecatch?.url || `"/img/common/no-image.webp`}
-                  alt=""
+                  alt="No Image"
                   className={styles.list__image}
                   width={post.eyecatch?.width}
                   height={post.eyecatch?.height}
@@ -46,10 +46,10 @@ export default function NewsList({ posts }: NewsListProps) {
             ) : (
               <Image
                 className={styles.list__image}
-                src="/img/common/noImage.webp"
+                src="/img/common/no-image.webp"
                 alt="No Image"
-                width={200}
-                height={100}
+                width={320}
+                height={160}
                 loading="lazy"
               />
             )}

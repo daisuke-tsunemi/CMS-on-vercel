@@ -32,17 +32,17 @@ export default function GlobalNav() {
       <nav className={`${styles.nav} ${isOpen ? styles.nav__open : ''}`}>
         <Link 
           className={styles.nav__link} 
+          href="/"
+          onClick={closeMenu}
+        >
+          ダッシュボード
+        </Link>
+        <Link 
+          className={styles.nav__link} 
           href="/news"
           onClick={closeMenu}
         >
           新着投稿
-        </Link>
-        <Link 
-          className={styles.nav__link} 
-          href="/#cv"
-          onClick={closeMenu}
-        >
-          ご相談はこちら
         </Link>
       </nav>
 

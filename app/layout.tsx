@@ -1,5 +1,4 @@
 import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import Sidebar from '@/components/Sidebar';
 import '@/styles/css/globals.css';
 import styles from './layout.module.scss';
@@ -16,11 +15,10 @@ export const metadata: Metadata = {
   robots: 'noindex, nofollow',
   title: {
     template: '%s | Sample CMS',
-    default: 'Sample CMS | 世代を超えて学ぶパソコン・プログラミングスクール',
+    default: 'Sample CMS',
   },
   description:
-    'Sample CMSは、9歳のお子様から80歳のシニアまで通える地域のパソコン・プログラミングスクールです。Scratchを使ったキッズプログラミングから、大人のエクセル・ワード基礎、シニア向けの個別学習まで、あなたの「やりたい」を全力でサポートします。',
-  keywords: 'パソコン教室,プログラミングスクール,Scratch,子供,シニア,初心者,Sample CMS',
+    'Sample CMSです',
   icons: {
     icon: '/favicon.ico',
     shortcut: '/favicon.ico',
@@ -29,10 +27,10 @@ export const metadata: Metadata = {
   openGraph: {
     title: {
       template: '%s | Sample CMS',
-      default: 'Sample CMS | 世代を超えて学ぶパソコン・プログラミングスクール',
+      default: 'Sample CMS',
     },
     description:
-      'Sample CMSは、9歳から80歳まで通える地域のパソコン教室です。キッズプログラミングから大人の個別学習まで、あなたの「やりたい」を叶えます。',
+      'Sample CMSです',
     images: ['/ogp.jpg'],
     type: 'website',
     url: '/',
@@ -41,9 +39,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Sample CMS | 世代を超えて学ぶパソコン・プログラミングスクール',
+    title: 'Sample CMS',
     description:
-      'Sample CMSは、9歳から80歳まで通える地域のパソコン教室です。キッズプログラミングから大人の個別学習まで、あなたの「やりたい」を叶えます。',
+      'Sample CMSです',
     images: ['/twitter-image.jpg'],
   },
 };
@@ -66,7 +64,6 @@ export default async function RootLayout({ children }: Props) {
               <div className={styles.wrapperContent}>
                 {children}
               </div>
-              <Footer />
             </main>
           </div>
         </Suspense>

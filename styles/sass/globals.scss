@@ -38,10 +38,6 @@
   --valid: hsl(173, 88%, 35%);
   --invalid: hsl(345, 87%, 95%);
   --invalid-dark: hsl(345, 80%, 48%);
-
-  /* LP用 */
-  --primary-lp: #0084E3;
-  --primary-dark-lp: #002FAF;
 }
 // ダークモード
 @media (prefers-color-scheme: dark) {

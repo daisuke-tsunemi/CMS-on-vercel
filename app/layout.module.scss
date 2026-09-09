@@ -2,23 +2,29 @@
 .wrapper{
   width: 100%;
   padding:3px;
+  display: grid;
+  gap: 3px;
   @include respond-lg{
-    display: grid;
-    grid-template-columns: 15rem 1fr;
-    gap: 3px;
+    grid-template-columns: 12.5rem 1fr;
     height: 100vh;
   }
+  >*{
+    min-height: 1px;
+  }
   &Content{
-    padding: 3vw;
+    flex: auto;
   }
 }
 .main {
+  padding: 2vh 3vw;
   width: 100%;
-  flex: auto;
   scroll-behavior: smooth;
   position:relative;
   background-color: var(--bg);
   border-radius: .5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 .loading{
   height: 100dvh;
