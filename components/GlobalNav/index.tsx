@@ -31,18 +31,20 @@ export default function GlobalNav() {
       {/* ナビゲーションメニュー */}
       <nav className={`${styles.nav} ${isOpen ? styles.nav__open : ''}`}>
         <Link 
-          className={styles.nav__link} 
+          className={`${styles.nav__link} u-align u-gap8`}
           href="/"
           onClick={closeMenu}
         >
-          ダッシュボード
+          <svg className="icon__w20"><use href="#dashboard" /></svg>
+          <span>ダッシュボード</span>
         </Link>
         <Link 
-          className={styles.nav__link} 
+          className={`${styles.nav__link} u-align u-gap8`}
           href="/news"
           onClick={closeMenu}
         >
-          新着投稿
+          <svg className="icon__w20"><use href="#check_circle" /></svg>
+          <span>新着投稿</span>
         </Link>
       </nav>
 
