@@ -1,0 +1,56 @@
+import Link from 'next/link';
+import DataTable, { type Column } from '@/components/List/DataTable';
+import { EMPTY_LABEL, formatSelect } from '@/libs/format';
+import type { Customer } from '@/libs/types';
+import styles from '@/components/List/list.module.scss';
+
+type Props = {
+  customers: Customer[];
+};
+
+const columns: Column<Customer>[] = [
+  {
+    header: '顧客名',
+    cell: (customer) => (
+      <Link href={`/customers/${customer.id}`} className="c-heading--sm">
+        {customer.name}
+      </Link>
+    ),
+  },
+  {
+    header: '担当者名',
+    cell: (customer) => customer.person ?? <span>{EMPTY_LABEL}</span>,
+  },
+  {
+    header: '優先度',
+    cell: (customer) => {
+      const priority = formatSelect(customer.priority);
+      return priority ? <span className={styles.tag}>{priority}</span> : <span>{EMPTY_LABEL}</span>;
+    },
+  },
+  {
+    header: '電話番号',
+    cell: (customer) =>
+      customer.tel ? <a href={`tel:${customer.tel}`}>{customer.tel}</a> : <span>{EMPTY_LABEL}</span>,
+  },
+  {
+    header: 'メールアドレス',
+    cell: (customer) =>
+      customer.mail ? (
+        <a href={`mailto:${customer.mail}`}>{customer.mail}</a>
+      ) : (
+        <span>{EMPTY_LABEL}</span>
+      ),
+  },
+];
+
+export default function CustomersList({ customers }: Props) {
+  return (
+    <DataTable
+      columns={columns}
+      rows={customers}
+      getKey={(customer) => customer.id}
+      emptyMessage="該当する顧客がありません。"
+    />
+  );
+}

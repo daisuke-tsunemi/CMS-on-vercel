@@ -1,4 +1,3 @@
-import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
 import '@/styles/css/globals.css';
 import styles from './layout.module.scss';
@@ -60,7 +59,6 @@ export default async function RootLayout({ children }: Props) {
           <div className={styles.wrapper}>
             <Sidebar />
             <main className={styles.main}>
-              <Header />
               <div className={styles.wrapperContent}>
                 {children}
               </div>

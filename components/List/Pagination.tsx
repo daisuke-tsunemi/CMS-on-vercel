@@ -1,7 +1,7 @@
 // components/Pagination.tsx
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import styles from './pagination.module.scss';
 
 type PaginationProps = {
@@ -10,12 +10,13 @@ type PaginationProps = {
   basePath?: string;
 };
 
-export default function Pagination({ 
-  currentPage, 
+export default function Pagination({
+  currentPage,
   totalPages,
-  basePath = '/news'
+  basePath,
 }: PaginationProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
 
   if (totalPages <= 1) return null;
@@ -24,7 +25,7 @@ export default function Pagination({
 
     const params = new URLSearchParams(searchParams.toString());
     params.set('page', page.toString());
-    router.push(`${basePath}?${params.toString()}`);
+    router.push(`${basePath ?? pathname}?${params.toString()}`);
   };
 
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);

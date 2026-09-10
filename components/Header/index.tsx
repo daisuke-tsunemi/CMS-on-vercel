@@ -1,9 +1,13 @@
 import styles from './index.module.scss';
 
-export default function Header() {
+type Props = {
+  title: string;
+};
+
+export default function Header({ title }: Props) {
   return (
     <header className={styles.header}>
-      <h1 className='c-heading--lg'>ダッシュボード</h1>
+      <h1 className='c-heading--lg'>{title}</h1>
     </header>
   );
 }

@@ -1,27 +1,13 @@
-import { client } from '@/libs/microcms';
-import ArticleList, { type Post } from '@/components/ArticleList';
+import { getContents } from '@/libs/microcms';
+import DealsList from '@/components/DealsList';
+import Header from '@/components/Header';
 import Link from 'next/link';
 import Image from 'next/image';
+import type { Deal } from '@/libs/types';
 import styles from './home.module.scss';
-import { HomeLIMIT } from '@/constants';
+import { DEALS_LIST_FIELDS, HomeLIMIT } from '@/constants';
 
 const PER_PAGE = HomeLIMIT; // 1ページあたりの表示件数
-
-// microCMSからブログ記事を取得
-async function getBlogPosts(page: number = 1) {
-  const offset = (page - 1) * PER_PAGE;
-  const data = await client.get({
-    endpoint: 'news',
-    queries: {
-      fields: 'id,eyecatch,title,publishedAt,category.id,category.name',
-      limit: PER_PAGE,
-      offset: offset,
-    },
-  });
-  return {
-    contents: data.contents as Post[],
-  };
-}
 
 export default async function Home({
   searchParams,
@@ -30,41 +16,55 @@ export default async function Home({
 }) {
   const params = await searchParams; // awaitで取得
   const currentPage = Number(params.page) || 1;
-  const { contents: posts } = await getBlogPosts(currentPage);
+  const deals = await getContents<Deal>('deals', {
+    fields: DEALS_LIST_FIELDS,
+    limit: PER_PAGE,
+    offset: (currentPage - 1) * PER_PAGE,
+  });
   return (
-    <div className={`${styles.wrapper}`}>
-      <section id="cta" className={`${styles.cta}`}>
-        <div>
-          <div className={`${styles.section__text} u-mt32`}>
-            <div className={`${styles.section__title} u-mb40 u-align between`}>
-              <h2 className='c-heading--4xl weight__500'>新着情報</h2>
-              <Link href="/news" className="c-btn__line sm">
-                  新着情報一覧へ
+    <>
+      <Header title="ダッシュボード" />
+      <div className={styles.wrapper}>
+        <Image
+          loading='lazy'
+          src="/img/common/robot_1.webp"
+          width={200}
+          height={201}
+          alt="robot"
+        />
+        <section className={styles.cta}>
+          <div>
+            <div className={`${styles.section__text} u-mt32`}>
+              <div className={`${styles.section__title} u-mb40 u-align between`}>
+                <h2 className='c-heading--4xl weight__500'>新着の商談・案件</h2>
+                <Link href="/deals" className="c-btn__line sm">
+                  商談・案件一覧へ
                 </Link>
-            </div>
-            <div>
-              <div className={`${styles.news__list} ${'p-section__body'}`}>
-                <ArticleList posts={posts} />
+              </div>
+              <div>
+                <div className={`${'p-section__body'}`}>
+                  <DealsList deals={deals} />
+                </div>
               </div>
             </div>
+            <div className={`${styles.quote} ${'u-mt40'}`}>
+              <h3 className="">アクセス</h3>
+              <p className="u-mt16">
+                <strong>住所</strong>
+                <br />
+                〒100-8111
+                <br />
+                東京都千代田区千代田１−１
+              </p>
+              <p className="u-mt16">
+                <strong>電話番号</strong>
+                <br />
+                090-1234-5678
+              </p>
+            </div>
           </div>
-          <div className={`${styles.quote} ${'u-mt40'}`}>
-            <h3 className="">アクセス</h3>
-            <p className="u-mt16">
-              <strong>住所</strong>
-              <br />
-              〒100-8111
-              <br />
-              東京都千代田区千代田１−１
-            </p>
-            <p className="u-mt16">
-              <strong>電話番号</strong>
-              <br />
-              090-1234-5678
-            </p>
-          </div>
-        </div>
-      </section>
-    </div>
+        </section>
+      </div>
+    </>
   );
 }

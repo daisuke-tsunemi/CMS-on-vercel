@@ -27,13 +27,13 @@ export const pageview = (path: string) => {
 // カスタムイベント送信（GTM用）
 export const event = ({
   event_name,
-  event_category,
+  event_employee,
   event_label,
   value,
   custom_parameters,
 }: {
   event_name: string;
-  event_category?: string;
+  event_employee?: string;
   event_label?: string;
   value?: number;
   custom_parameters?: Record<string, any>;
@@ -41,7 +41,7 @@ export const event = ({
   if (typeof window !== 'undefined' && window.dataLayer) {
     window.dataLayer.push({
       event: event_name,
-      event_category,
+      event_employee,
       event_label,
       value,
       ...custom_parameters,
