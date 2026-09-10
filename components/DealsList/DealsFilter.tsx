@@ -1,33 +1,27 @@
 'use client';
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import type { Employee } from '@/libs/types';
 import styles from '@/components/List/search.module.scss';
 
-export type DealsFilterEmployee = {
-  id: string;
-  name: string;
-};
-
 type Props = {
-  employeeId: string;
-  employees: DealsFilterEmployee[];
-  onEmployeeChange: (next: string) => void;
+  employees: Employee[];
 };
 
-export default function DealsFilter({ employeeId, employees, onEmployeeChange }: Props) {
+export default function DealsFilter({ employees }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const handleChange = (next: string) => {
-    onEmployeeChange(next);
+  const employeeId = searchParams.get('employee') ?? '';
 
+  const handleChange = (next: string) => {
     const params = new URLSearchParams(searchParams.toString());
     if (next) params.set('employee', next);
     else params.delete('employee');
     // 絞り込みが変わったら1ページ目に戻す
     params.delete('page');
-    router.replace(`${pathname}?${params.toString()}`);
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
   return (

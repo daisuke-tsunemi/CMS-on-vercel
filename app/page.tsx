@@ -1,69 +1,84 @@
-import { getContents } from '@/libs/microcms';
-import DealsList from '@/components/DealsList';
 import Header from '@/components/Header';
-import Link from 'next/link';
-import Image from 'next/image';
+import ChartCard from '@/components/Dashboard/ChartCard';
+import StatTiles from '@/components/Dashboard/StatTiles';
+import SalesTrendChart from '@/components/Dashboard/SalesTrendChart';
+import StatusBreakdownChart from '@/components/Dashboard/StatusBreakdownChart';
+import EmployeeSalesChart from '@/components/Dashboard/EmployeeSalesChart';
+import {
+  EmployeeSalesTable,
+  MonthlyTrendTable,
+  StatusBreakdownTable,
+} from '@/components/Dashboard/ChartTables';
+import { getAllContents } from '@/libs/microcms';
+import {
+  buildEmployeeSales,
+  buildMonthlyTrend,
+  buildStatusBreakdown,
+  buildSummary,
+} from '@/libs/analytics';
 import type { Deal } from '@/libs/types';
-import styles from './home.module.scss';
-import { DEALS_LIST_FIELDS, HomeLIMIT } from '@/constants';
+import {
+  DASHBOARD_EMPLOYEE_LIMIT,
+  DASHBOARD_MONTHS,
+  DEALS_ANALYTICS_FIELDS,
+} from '@/constants';
+import styles from '@/components/Dashboard/dashboard.module.scss';
 
-const PER_PAGE = HomeLIMIT; // 1ページあたりの表示件数
+// 集計は全件取得が必要なので都度リクエストせず5分間キャッシュする
+export const revalidate = 300;
 
-export default async function Home({
-  searchParams,
-}: {
-  searchParams: Promise<{ page?: string }>; // Promiseを追加
-}) {
-  const params = await searchParams; // awaitで取得
-  const currentPage = Number(params.page) || 1;
-  const deals = await getContents<Deal>('deals', {
-    fields: DEALS_LIST_FIELDS,
-    limit: PER_PAGE,
-    offset: (currentPage - 1) * PER_PAGE,
+export default async function Home() {
+  const { contents: deals, totalCount, truncated } = await getAllContents<Deal>('deals', {
+    fields: DEALS_ANALYTICS_FIELDS,
+    orders: '-publishedAt',
   });
+
+  const summary = buildSummary(deals);
+  const monthly = buildMonthlyTrend(deals, DASHBOARD_MONTHS);
+  const statuses = buildStatusBreakdown(deals);
+  const employees = buildEmployeeSales(deals, DASHBOARD_EMPLOYEE_LIMIT);
+
   return (
     <>
       <Header title="ダッシュボード" />
-      <div className={styles.wrapper}>
-        <Image
-          loading='lazy'
-          src="/img/common/robot_1.webp"
-          width={200}
-          height={201}
-          alt="robot"
-        />
-        <section className={styles.cta}>
-          <div>
-            <div className={`${styles.section__text} u-mt32`}>
-              <div className={`${styles.section__title} u-mb40 u-align between`}>
-                <h2 className='c-heading--4xl weight__500'>新着の商談・案件</h2>
-                <Link href="/deals" className="c-btn__line sm">
-                  商談・案件一覧へ
-                </Link>
-              </div>
-              <div>
-                <div className={`${'p-section__body'}`}>
-                  <DealsList deals={deals} />
-                </div>
-              </div>
-            </div>
-            <div className={`${styles.quote} ${'u-mt40'}`}>
-              <h3 className="">アクセス</h3>
-              <p className="u-mt16">
-                <strong>住所</strong>
-                <br />
-                〒100-8111
-                <br />
-                東京都千代田区千代田１−１
-              </p>
-              <p className="u-mt16">
-                <strong>電話番号</strong>
-                <br />
-                090-1234-5678
-              </p>
-            </div>
-          </div>
-        </section>
+
+      {truncated && (
+        <p className={`${styles.notice} u-mb24`}>
+          商談 {totalCount.toLocaleString('ja-JP')} 件のうち、直近{' '}
+          {deals.length.toLocaleString('ja-JP')} 件を集計対象にしています。
+        </p>
+      )}
+
+      <div className="u-mb24">
+        <StatTiles summary={summary} />
+      </div>
+
+      <div className={styles.grid}>
+        <div className={styles.grid__wide}>
+          <ChartCard
+            title="月別 売上・見込み金額の推移"
+            note={`直近 ${DASHBOARD_MONTHS} ヶ月／商談の公開日で集計`}
+            table={<MonthlyTrendTable data={monthly} />}
+          >
+            <SalesTrendChart data={monthly} />
+          </ChartCard>
+        </div>
+
+        <ChartCard
+          title="ステータス別 商談数"
+          note="色の濃さがパイプラインの進行度を表す"
+          table={<StatusBreakdownTable data={statuses} />}
+        >
+          <StatusBreakdownChart data={statuses} />
+        </ChartCard>
+
+        <ChartCard
+          title="担当者別 売上金額"
+          note="複数担当の案件は各担当に満額を計上（合計は売上金額と一致しない）"
+          table={<EmployeeSalesTable data={employees} />}
+        >
+          <EmployeeSalesChart data={employees} />
+        </ChartCard>
       </div>
     </>
   );

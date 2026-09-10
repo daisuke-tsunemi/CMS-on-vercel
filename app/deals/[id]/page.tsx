@@ -1,23 +1,43 @@
-import { getContent, getContentIds, getContents } from '@/libs/microcms';
+import { getContent, getContents } from '@/libs/microcms';
 import Header from '@/components/Header';
-import Image from 'next/image';
+import RelatedSection from '@/components/List/RelatedSection';
+import Empty from '@/components/List/Empty';
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { EMPTY_LABEL, formatDate, formatDateTime, formatPrice, formatSelect } from '@/libs/format';
+import { buildListQueries, parsePage, type ListSearchParams } from '@/libs/listParams';
 import type { Activity, Deal } from '@/libs/types';
 import styles from '@/app/detail.module.scss';
 
-export default async function DealDetailPage({ params }: { params: Promise<{ id: string }> }) {
+// 関連リストをページングするため searchParams を読む
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+export default async function DealDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<ListSearchParams>;
+}) {
   const { id } = await params;
+  const { page } = await searchParams;
+  const currentPage = parsePage(page);
+
   const deal = await getContent<Deal>('deals', id);
   if (!deal) notFound();
 
   // この案件に紐づく活動履歴（activities.deals が単一コンテンツ参照）
-  const activities = await getContents<Activity>('activities', {
-    filters: `deals[equals]${id}`,
-    orders: '-activatedAt',
-    fields: 'id,activatedAt,activity-content,activity-next',
-  });
+  const { contents: activities, totalCount: activitiesCount } = await getContents<Activity>(
+    'activities',
+    buildListQueries({
+      page: currentPage,
+      filters: `deals[equals]${id}`,
+      orders: '-activatedAt',
+      fields: 'id,activatedAt,activity-content,activity-next',
+    }),
+  );
 
   const publishedAt = formatDate(deal.publishedAt);
   const status = formatSelect(deal.status);
@@ -109,12 +129,9 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
             </div>
           )}
 
-          <section className={styles.content}>
-            <h3 className="u-mb16">活動履歴</h3>
+          <RelatedSection title="活動履歴" totalCount={activitiesCount} currentPage={currentPage}>
             {activities.length === 0 ? (
-              <div className="p-data__none">
-                <p>この案件に紐づく活動履歴はまだありません。</p>
-              </div>
+              <Empty message="この案件に紐づく活動履歴はまだありません。" />
             ) : (
               <dl>
                 {activities.map((activity) => (
@@ -134,16 +151,9 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
                 ))}
               </dl>
             )}
-          </section>
+          </RelatedSection>
         </div>
       </div>
     </>
   );
-}
-
-// 静的パスを生成
-export async function generateStaticParams() {
-  const contentIds = await getContentIds('deals');
-
-  return contentIds.map((contentId) => ({ id: contentId }));
 }

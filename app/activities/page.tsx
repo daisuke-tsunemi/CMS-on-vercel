@@ -1,25 +1,40 @@
 // app/activities/page.tsx
 import { getContents } from '@/libs/microcms';
-import ActivitiesBody from '@/components/ActivitiesList/ActivitiesBody';
+import ActivitiesList from '@/components/ActivitiesList';
 import Header from '@/components/Header';
+import ListToolbar from '@/components/List/ListToolbar';
+import Pagination from '@/components/List/Pagination';
+import { buildListQueries, parsePage, type ListSearchParams } from '@/libs/listParams';
 import type { Activity } from '@/libs/types';
-import { FETCH_LIMIT } from '@/constants';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-export default async function Activities() {
-  const activities = await getContents<Activity>('activities', {
-    fields: 'id,activatedAt,activity-content,activity-next,deals.id,deals.title',
-    orders: '-activatedAt',
-    limit: FETCH_LIMIT,
-  });
+export default async function Activities({
+  searchParams,
+}: {
+  searchParams: Promise<ListSearchParams>;
+}) {
+  const { page, q } = await searchParams;
+  const currentPage = parsePage(page);
+
+  const { contents: activities, totalCount } = await getContents<Activity>(
+    'activities',
+    buildListQueries({
+      page: currentPage,
+      q,
+      fields: 'id,activatedAt,activity-content,activity-next,deals.id,deals.title',
+      orders: '-activatedAt',
+    }),
+  );
 
   return (
     <>
       <Header title="活動履歴一覧" />
       <section>
-        <ActivitiesBody activities={activities} />
+        <ListToolbar totalCount={totalCount} placeholder="活動内容・次回予定で検索" />
+        <ActivitiesList activities={activities} />
+        <Pagination totalCount={totalCount} currentPage={currentPage} />
       </section>
     </>
   );

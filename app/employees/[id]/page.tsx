@@ -1,28 +1,42 @@
-import { getContent, getContentIds, getContents } from '@/libs/microcms';
+import { getContent, getContents } from '@/libs/microcms';
 import Header from '@/components/Header';
 import DealsList from '@/components/DealsList';
+import RelatedSection from '@/components/List/RelatedSection';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { buildListQueries, parsePage, type ListSearchParams } from '@/libs/listParams';
 import type { Deal, Employee } from '@/libs/types';
-import { DEALS_LIST_FIELDS, FETCH_LIMIT } from '@/constants';
+import { DEALS_LIST_FIELDS } from '@/constants';
 import styles from '@/app/detail.module.scss';
+
+// 関連リストをページングするため searchParams を読む
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function EmployeeDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<ListSearchParams>;
 }) {
   const { id } = await params;
+  const { page } = await searchParams;
+  const currentPage = parsePage(page);
+
   const employee = await getContent<Employee>('employees', id);
   if (!employee) notFound();
 
   // この担当者が付いている商談・案件（deals.employee が複数コンテンツ参照のため contains で絞る）
-  const deals = await getContents<Deal>('deals', {
-    filters: `employee[contains]${id}`,
-    fields: DEALS_LIST_FIELDS,
-    limit: FETCH_LIMIT,
-  });
+  const { contents: deals, totalCount: dealsCount } = await getContents<Deal>(
+    'deals',
+    buildListQueries({
+      page: currentPage,
+      filters: `employee[contains]${id}`,
+      fields: DEALS_LIST_FIELDS,
+    }),
+  );
 
   return (
     <>
@@ -54,18 +68,15 @@ export default async function EmployeeDetailPage({
             </div>
           )}
 
-          <section className={styles.content}>
-            <h3 className="u-mb16">担当している商談・案件</h3>
+          <RelatedSection
+            title="担当している商談・案件"
+            totalCount={dealsCount}
+            currentPage={currentPage}
+          >
             <DealsList deals={deals} />
-          </section>
+          </RelatedSection>
         </div>
       </div>
     </>
   );
-}
-
-export async function generateStaticParams() {
-  const contentIds = await getContentIds('employees');
-
-  return contentIds.map((contentId) => ({ id: contentId }));
 }
