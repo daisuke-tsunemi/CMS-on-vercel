@@ -11,6 +11,7 @@ import {
   YAxis,
 } from 'recharts';
 import ChartTooltip from './ChartTooltip';
+import Empty from '@/components/List/Empty';
 import { INK, MARK, SERIES } from './chartTheme';
 import { niceTicks } from './chartTicks';
 import { formatCompact } from '@/libs/format';
@@ -21,6 +22,9 @@ type Props = {
 };
 
 export default function EmployeeSalesChart({ data }: Props) {
+  // 0件だと軸すら描かれず枠だけになるため、明示的に空状態を出す
+  if (data.length === 0) return <Empty message="対象期間に担当者が紐づく商談がありません。" />;
+
   const ticks = niceTicks(Math.max(0, ...data.map((point) => point.sales)));
 
   return (

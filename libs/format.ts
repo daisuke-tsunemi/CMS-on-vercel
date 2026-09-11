@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+import { jst } from './datetime';
 
 /** 未入力を表す共通ラベル */
 export const EMPTY_LABEL = '未設定';
@@ -19,13 +19,13 @@ export const formatPrice = (value?: string | number | null): string | null => {
   return Number.isNaN(num) ? String(value) : num.toLocaleString('ja-JP');
 };
 
-/** 日付を「2026.09.09」形式にする */
+/** 日付を「2026.09.09」形式にする（JST 固定） */
 export const formatDate = (value?: string | null): string | null =>
-  value ? dayjs(value).format('YYYY.MM.DD') : null;
+  value ? jst(value).format('YYYY.MM.DD') : null;
 
-/** 日時を「2026.09.09 17:00」形式にする */
+/** 日時を「2026.09.09 17:00」形式にする（JST 固定） */
 export const formatDateTime = (value?: string | null): string | null =>
-  value ? dayjs(value).format('YYYY.MM.DD HH:mm') : null;
+  value ? jst(value).format('YYYY.MM.DD HH:mm') : null;
 
 /** セレクトフィールド（配列で返る）を「A / B」形式にする */
 export const formatSelect = (value?: string[] | null): string | null =>

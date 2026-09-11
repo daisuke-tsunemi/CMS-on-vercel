@@ -7,6 +7,64 @@ $ink-secondary: #52514e;
 $ink-muted: #898781;
 $hairline: #e1e0d9;
 
+// 絞り込みは全チャートの上に1行でまとめる（チャートごとに置かない）
+.filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5rem .75rem;
+  margin-bottom: 1.5rem;
+  position:relative;
+  &__label {
+    color: $ink-secondary;
+    font-size: .8125rem;
+    font-weight: 500;
+  }
+  &__input {
+    background-color: #fff;
+    border: 1px solid var(--border-dark);
+    border-radius: .25rem;
+    color: $ink-primary;
+    font-size: .875rem;
+    padding: .375rem .5rem;
+    font-variant-numeric: tabular-nums;
+    &:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 1px;
+    }
+  }
+  &__range {
+    color: $ink-secondary;
+    font-size: .8125rem;
+    strong {
+      color: $ink-primary;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+  &__reset {
+    background: none;
+    border: none;
+    color: var(--primary);
+    cursor: pointer;
+    font-size: .8125rem;
+    padding: .25rem;
+    text-decoration: underline;
+  }
+}
+.robot{
+  position: absolute;
+  bottom: -5vh;
+  right:-2vw;
+  height: auto;
+  width: clamp(2rem, 30vw, 12.5rem);
+  @include respond-md {
+    bottom: -3rem;
+  }
+  @include respond-md {
+    bottom: -5rem;
+  }
+}
+
 .grid {
   display: grid;
   gap: 1.5rem;
@@ -29,11 +87,6 @@ $hairline: #e1e0d9;
   border: 1px solid var(--border);
   // 軸ラベルまで収まるよう高さは内容に追従させる
   min-width: 0;
-  &__note {
-    color: $ink-muted;
-    font-size: .75rem;
-    margin-top: .25rem;
-  }
   // グローバルの details（アコーディオンカード）はチャート内では主張が強すぎるので抑える
   &__table {
     margin-top: 1rem;
@@ -55,15 +108,13 @@ $hairline: #e1e0d9;
       color: $ink-secondary;
       font-size: .8125rem;
       font-weight: 500;
-      padding: .625rem 1.75rem .625rem 0;
-      &:hover {
-        background-color: transparent;
-        text-decoration: underline;
-      }
+      padding: .625rem 1.75rem .625rem .5rem;
     }
     &Body {
       margin-top: .75rem;
       overflow-x: auto;
+      border-radius: .25rem;
+      border: var(--border) 1px solid;
       // 見出しは視覚的には隠し、支援技術には残す
       caption {
         position: absolute;
@@ -112,7 +163,7 @@ $hairline: #e1e0d9;
 .tile {
   background-color: $surface;
   border-radius: .5rem;
-  padding: 1.25rem;
+  padding: 3vh 2.5vw;
   border: 1px solid var(--border);
   &__label {
     color: $ink-secondary;

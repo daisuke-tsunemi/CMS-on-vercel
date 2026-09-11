@@ -12,8 +12,8 @@ export default function ChartCard({ title, note, children, table }: Props) {
   return (
     <section className={styles.card}>
       <div className="u-mb16">
-        <h2 className="c-heading--sm">{title}</h2>
-        {note && <p className={styles.card__note}>{note}</p>}
+        <h2 className="c-heading--md">{title}</h2>
+        {note && <p className='c-txt__xs color__70'>{note}</p>}
       </div>
       {children}
       <details className={styles.card__table}>

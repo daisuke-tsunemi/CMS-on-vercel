@@ -1,4 +1,5 @@
-import dayjs from 'dayjs';
+import type { Dayjs } from 'dayjs';
+import { jst } from './datetime';
 import type { Deal } from './types';
 import { DEAL_STATUS_ORDER, DEAL_WON_STATUS } from '@/constants';
 
@@ -56,10 +57,12 @@ export const buildSummary = (deals: Deal[]): DashboardSummary => {
   };
 };
 
-/** 直近 months ヶ月を0埋めして返す（データが無い月も軸に出す） */
-export const buildMonthlyTrend = (deals: Deal[], months: number): MonthlyPoint[] => {
-  const start = dayjs().startOf('month').subtract(months - 1, 'month');
-
+/** 起点月から months ヶ月分を0埋めして返す（データが無い月も軸に出す） */
+export const buildMonthlyTrend = (
+  deals: Deal[],
+  start: Dayjs,
+  months: number,
+): MonthlyPoint[] => {
   const buckets = new Map<string, MonthlyPoint>();
   for (let index = 0; index < months; index += 1) {
     const month = start.add(index, 'month');
@@ -69,7 +72,7 @@ export const buildMonthlyTrend = (deals: Deal[], months: number): MonthlyPoint[]
 
   for (const deal of deals) {
     if (!deal.publishedAt) continue;
-    const bucket = buckets.get(dayjs(deal.publishedAt).format('YYYY-MM'));
+    const bucket = buckets.get(jst(deal.publishedAt).format('YYYY-MM'));
     // 集計期間より古い商談は対象外
     if (!bucket) continue;
     bucket.sales += deal.sales ?? 0;

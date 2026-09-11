@@ -1,5 +1,6 @@
 import Header from '@/components/Header';
 import ChartCard from '@/components/Dashboard/ChartCard';
+import PeriodFilter from '@/components/Dashboard/PeriodFilter';
 import StatTiles from '@/components/Dashboard/StatTiles';
 import SalesTrendChart from '@/components/Dashboard/SalesTrendChart';
 import StatusBreakdownChart from '@/components/Dashboard/StatusBreakdownChart';
@@ -16,6 +17,7 @@ import {
   buildStatusBreakdown,
   buildSummary,
 } from '@/libs/analytics';
+import { buildPeriod, defaultStartMonth } from '@/libs/period';
 import type { Deal } from '@/libs/types';
 import {
   DASHBOARD_EMPLOYEE_LIMIT,
@@ -24,17 +26,26 @@ import {
 } from '@/constants';
 import styles from '@/components/Dashboard/dashboard.module.scss';
 
-// 集計は全件取得が必要なので都度リクエストせず5分間キャッシュする
+// 起点月ごとの集計結果を5分間キャッシュする
 export const revalidate = 300;
 
-export default async function Home() {
+type Props = {
+  searchParams: Promise<{ from?: string }>;
+};
+
+export default async function Home({ searchParams }: Props) {
+  const { from } = await searchParams;
+  const period = buildPeriod(from, DASHBOARD_MONTHS);
+
+  // 期間で API 側を絞るので、KPI・各チャート・テーブルがすべて同じスライスになる
   const { contents: deals, totalCount, truncated } = await getAllContents<Deal>('deals', {
     fields: DEALS_ANALYTICS_FIELDS,
+    filters: period.filters,
     orders: '-publishedAt',
   });
 
   const summary = buildSummary(deals);
-  const monthly = buildMonthlyTrend(deals, DASHBOARD_MONTHS);
+  const monthly = buildMonthlyTrend(deals, period.start, DASHBOARD_MONTHS);
   const statuses = buildStatusBreakdown(deals);
   const employees = buildEmployeeSales(deals, DASHBOARD_EMPLOYEE_LIMIT);
 
@@ -42,10 +53,16 @@ export default async function Home() {
     <>
       <Header title="ダッシュボード" />
 
+      <PeriodFilter
+        startValue={period.startValue}
+        label={period.label}
+        defaultValue={defaultStartMonth()}
+      />
+
       {truncated && (
         <p className={`${styles.notice} u-mb24`}>
-          商談 {totalCount.toLocaleString('ja-JP')} 件のうち、直近{' '}
-          {deals.length.toLocaleString('ja-JP')} 件を集計対象にしています。
+          対象期間の商談 {totalCount.toLocaleString('ja-JP')} 件のうち、
+          {deals.length.toLocaleString('ja-JP')} 件を集計しています。
         </p>
       )}
 
@@ -57,7 +74,7 @@ export default async function Home() {
         <div className={styles.grid__wide}>
           <ChartCard
             title="月別 売上・見込み金額の推移"
-            note={`直近 ${DASHBOARD_MONTHS} ヶ月／商談の公開日で集計`}
+            note={`${period.label}／商談の公開日で集計`}
             table={<MonthlyTrendTable data={monthly} />}
           >
             <SalesTrendChart data={monthly} />

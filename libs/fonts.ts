@@ -9,7 +9,7 @@ import { Montserrat, Zen_Kaku_Gothic_New, Zen_Maru_Gothic } from "next/font/goog
 
 export const montserrat = Montserrat({
   subsets: ["latin"],
-  weight: ["400", "700"],
+  weight: ["400", "500", "700"],
   variable: "--font-montserrat",
   preload: false,
   adjustFontFallback: true,
@@ -17,7 +17,7 @@ export const montserrat = Montserrat({
 
 export const zenKaku = Zen_Kaku_Gothic_New({
   subsets: ["latin"],
-  weight: ["400", "700"],
+  weight: ["400", "500", "700"],
   variable: "--font-zen-kaku-gothic-new",
   display: "swap",
   preload: false,

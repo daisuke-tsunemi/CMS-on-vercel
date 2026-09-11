@@ -1,7 +1,6 @@
 @use "../../foundation/variables" as *;
 .c-heading{
   font-weight: 700;
-  letter-spacing: .05em;
   line-height: 1.41;
   &--4xl{
     @extend .c-heading;
